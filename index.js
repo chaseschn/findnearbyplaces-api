@@ -15,33 +15,41 @@ application.get('/', (request, response) => {
   response.status(200).json({done: true, message: 'Fine!'});
 });
 
-application.get('/register', (request,response) =>{
-  let name = request.body.name;
-  let email = request.body.email;
-  let password = request.body.password;
-  response.status(200).json({ done: true, message: 'customer added'})
-});
-
-application.post('/login', (request,response) => {
+application.post('/login', (request, response) => {
   let password = request.body.password;
   let email = request.body.email;
-  response.status(200).json({ done: true, message: 'customer logged in'})
+  store.login(email, password).then((x) => {
+    response.status(200).json({ done: true, message: "Customer logged in successfully"})
+  }).catch(err => {
+    response.status(404).json({ done: false, message: "Customer not logged in"})
+  })
 });
 
-application.get('/search', (request, response) => {
-  let user_location = request.body.user_location;
-  let radius_filter = request.body.radius_filter;
-  let maximum_results_to_return = request.body.maximum_results_to_return;
-  let category_filter = request.body.category_filter;
-  let sort = request.body.sort;
-  let distance = request.body.distance;
-  response.status(200).json({ done: true, result: 'search completed'})
+application.get('/search/:search_term/:user_location/:radius_filter/:maximum_results_to_return/:category_filter/:sort/:distance', (request, response) => {
+  let search_term = req.parms.user.search_term;
+  let user_location = request.parms.user_location;
+  let radius_filter = request.parms.radius_filter;
+  let maximum_results_to_return = request.parms.maximum_results_to_return;
+  let category_filter = request.parms.category_filter;
+  let sort = request.parms.sort;
+  let distance = request.parms.distance;
+  store.search(search_term,user_location,radius_filter,maximum_results_to_return,category_filter,sort,distance).then((x) => {
+    if(x.length > 0) {
+      response.status(200).json({ done: true, result: x})
+    } else {
+      response.status(404).json({ done: false, result: "No results found"})
+    }
+  })
 });
 
 application.post('/customer', (request, response) => {
   let password = request.body.password;
   let email = request.body.email;
-  response.status(200).json({ done: true, message: 'customer logged in'})
+  store.customer(email, password).then((x) => {
+    response.status(200).json({ done: true, message: "Customer registered successfully"})
+  }).catch(err => {
+    response.status(404).json({ done: false, message: "Customer not registered"})
+  })
 });
 
 application.post('/place', (request, response) => {
@@ -50,63 +58,104 @@ application.post('/place', (request, response) => {
   let latitude = request.body.latitude;
   let longitude = request.body.longitude;
   let description = request.body.description;
-  response.status(200).json({ done: true, message: 'customer logged in', id: 'id'})
+  store.place(name, category_id, latitude, longitude, description).then((x) => {
+    response.status(200).json({ done: true, message: 'Place added successfully', id: x.id})
+  }).catch(err => {
+    response.status(404).json({ done: false, message: "Place not added"})
+  })
 });
 
 application.post('/category', (request, response) => {
   let name = request.body.name;
-  response.status(200).json({ done: true, message: 'category', id: 'id'})
+  store.addCategory(name).then((x) => {
+    response.status(200).json({ done: true, message: 'Category added successfully', id: x.id})
+  }).catch(err => {
+    response.status(404).json({ done: false, message: "Category not added"})
+  })
 });
 
 application.post('/photo', (request, response) => {
   let photo = request.body.photo;
   let place_id = request.body.place_id;
   let review_id = request.body.review_id;
-  response.status(200).json({ done: true, message: 'photo', id: 'id'})
+  store.addPhoto(photo,review_id,place_id).then((x) => {
+    response.status(200).json({ done: true, message: 'Review photo added successfully', id: x.id})
+  }).catch(err => {
+    response.status(404).json({ done: false, message: "Review photo not added"})
+  })
 });
 
 application.post('/review', (request, response) => {
   let place_id = request.body.place_id;
   let comment = request.body.comment;
   let rating = request.body.rating;
-  response.status(200).json({ done: true, message: 'review', id: 'id'})
+  store.addReview(place_id, comment, rating).then((x) => {
+    response.status(200).json({ done: true, message: 'Review added successfully',id: x.id})
+  }).catch(err => {
+    response.status(404).json({ done: false, message: "Review not added"})
+  })
 });
 
 application.put('/place', (request, response) => {
+  let place_id = request.body.place_id;
   let name = request.body.name;
   let category_id = request.body.category_id;
   let latitude = request.body.latitude;
   let longitude = request.body.longitude;
   let description = request.body.description;
-  response.status(200).json({ done: true, message: 'place', id: 'id'})
+  store.updatePlace(place_id, name, category_id, latitude, longitude, description).then((x) => {
+    response.status(200).json({ done: true, message: 'Place update successfully'})
+  }).catch(err => {
+    response.status(404).json({ done: false, message: "place not updated"})
+  })
 });
 
 application.put('/review', (request, response) => {
   let place_id = request.body.place_id;
   let comment = request.body.comment;
   let rating = request.body.rating;
-  response.status(200).json({ done: true, message: 'review', id: 'id'})
+  store.updateReview(review_id,comment,rating).then((x) => {
+    response.status(200).json({ done: true, message: 'Review update successfully'})
+  }).catch(err => {
+    response.status(404).json({ done: false, message: "Review not updated"})
+  })
 });
 
 application.put('/photo', (request, response) => {
   let photo = request.body.photo;
   let photo_id = request.body.place_id;
-  response.status(200).json({ done: true, message: 'photo'})
+  store.updatePhoto(photo, photo_id).then((x) => {
+    response.status(200).json({ done: true, message: 'Photo update successfully'})
+  }).catch(err => {
+    response.status(404).json({ done: false, message: "Photo not updated"})
+  })
 });
 
 application.delete('/place', (request, response) => {
   let place_id = request.body.place_id;
-  response.status(200).json({ done: true, message: 'place'})
+  store.deletePlace(place_id).then((x) => {
+    response.status(200).json({ done: true, message: 'Place deleted successfully'})
+  }).catch(err => {
+    response.status(404).json({ done: false, message: "Place not deleted"})
+  })
 });
 
 application.delete('/review', (request, response) => {
   let review_id = request.body.review_id;
-  response.status(200).json({ done: true, message: 'place'})
+  store.deleteReview(review_id).then((x) => {
+    response.status(200).json({ done: true, message: 'Review deleted successfully'})
+  }).catch(err => {
+    response.status(404).json({ done: false, message: "Review not deleted"})
+  })
 });
 
 application.delete('/photo', (request, response) => {
   let photo_id = request.body.photo_id;
-  response.status(200).json({ done: true, message: 'photo'})
+  store.deletePhoto(photo_id).then((x) => {
+    response.status(200).json({ done: true, message: 'Photo deleted successfully'})
+  }).catch(err => {
+    response.status(404).json({ done: false, message: "Photo not deleted"})
+  })
 
 });
 
