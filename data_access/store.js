@@ -19,7 +19,7 @@ let store = {
   },
   login: (email, password) => {
     pool.query('select email, password from findnearbyplaces.customer where findnearbyplaces.customer.email = $1',[email] ).then((x) => {
-      if(x.orws.length == 1){
+      if(x.rows.length == 1){
         return {done: true}
       } else {
         return { done: false, result: "No results found"};
@@ -27,6 +27,7 @@ let store = {
     }).catch((e) => {
       return { done: false, result: "No results found"};
     })
+    return { done: false, result: "No results found"};
   },
   customer: (email, password) => {
     return pool.query('insert into findnearbyplaces.customer (email, password) values ($1, $2)', [email, password]);
