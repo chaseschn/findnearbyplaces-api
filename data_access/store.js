@@ -18,8 +18,7 @@ let store = {
     })
   },
   login: (email, password) => {
-    pool.query('select email, password from findnearbyplaces.customer where findnearbyplaces.customer.email = $1',[email] )
-    .then((x) => {
+    pool.query('select email, password from findnearbyplaces.customer where findnearbyplaces.customer.email = $1',[email] ).then((x) => {
       if(x.orws.length == 1){
         return {done: true}
       } else {
