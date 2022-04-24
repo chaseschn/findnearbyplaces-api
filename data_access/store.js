@@ -30,7 +30,7 @@ let store = {
     })
   },
   customer: (email, password) => {
-    return pool.query('insert into findnearbyplaces.customer (email, password) values ($1, $2)', [email, hash]);
+    return pool.query('insert into findnearbyplaces.customer (email, password) values ($1, $2)', [email, password]);
   },
   place: (name, category_id, latitude, longitude, description) => {
     return pool.query('insert into findnearbyplaces.place (name, latitude, longitude, description, category_id, customer_id) values ($1, $2, $3, $4, $5) returning id',

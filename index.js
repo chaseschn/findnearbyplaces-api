@@ -111,7 +111,7 @@ application.put('/place', (request, response) => {
 });
 
 application.put('/review', (request, response) => {
-  let place_id = request.body.place_id;
+  let review_id = request.body.place_id;
   let comment = request.body.comment;
   let rating = request.body.rating;
   store.updateReview(review_id,comment,rating).then((x) => {
