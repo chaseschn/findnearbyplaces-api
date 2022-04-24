@@ -1,7 +1,7 @@
 const express = require("express");
-//const {store} = require("./temp/store");
 const cors = require('cors');
 require('dotenv').config();
+const {store} = require("./data_access/store");
 
 const application = express();
 const port = process.env.PORT || 4002;
