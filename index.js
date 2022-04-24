@@ -18,7 +18,7 @@ application.get('/', (request, response) => {
 application.post('/login', (request, response) => {
   let password = request.body.password;
   let email = request.body.email;
-  store.login(email, password).then((x) => {
+  results = store.login(email, password).then((x) => {
     response.status(200).json({ done: true, message: "Customer logged in successfully"})
   }).catch(err => {
     response.status(404).json({ done: false, message: "Customer not logged in"})
